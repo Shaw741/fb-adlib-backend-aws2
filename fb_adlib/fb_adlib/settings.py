@@ -17,7 +17,10 @@ NEWSPIDER_MODULE = 'fb_adlib.spiders'
 #USER_AGENT = 'fb_adlib (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+
+
+# SPLASH_URL = 'http://192.168.1.20:8050/'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -86,3 +89,37 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+# DOWNLOADER_MIDDLEWARES = { 
+#     'scrapy_splash.SplashCookiesMiddleware': 723, 
+#     'scrapy_splash.SplashMiddleware': 725, 
+#     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810, 
+# }
+
+# SPIDER_MIDDLEWARES = { 
+#     'scrapy_splash.SplashDeduplicateArgsMiddleware': 100, 
+# }
+
+# DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
+# HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
+
+# DOWNLOADER_MIDDLEWARES = {
+#     'scrapyjs.SplashMiddleware': 725,
+# }
+
+# DUPEFILTER_CLASS = 'scrapyjs.SplashAwareDupeFilter'
+
+# HTTPCACHE_STORAGE = 'scrapyjs.SplashAwareFSCacheStorage'
+
+SCRAPINGBEE_API_KEY = '0WGD4PSQJUWUVDCGGN4OJERKKCWGNDI0ZTPYGNFRE5MF6F51FT1QWRBCUMR8GD3CI97JBD6SN4C10T7J'
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_scrapingbee.ScrapingBeeMiddleware': 725,
+}
+
+ITEM_PIPELINES = {
+    'fb_adlib.pipelines.FbAdlibPipeline': 300,
+}
+
+CONCURRENT_REQUESTS = 1

@@ -8,5 +8,12 @@ import scrapy
 
 class FbAdlibItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    status = scrapy.Field()
+    startDate = scrapy.Field()
+    platforms = scrapy.Field()
+    adID = scrapy.Field()
+    noOfAds = scrapy.Field()
+    displayURL = scrapy.Field()
+    headline = scrapy.Field()
+    ctaStatus = scrapy.Field()
+    leadingURL = scrapy.Field()
