@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+
+  Sample SAM Template for sam-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 900
+
+Resources:
+  FbAdsLibPageScraperFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: python3.x
+      DockerContext: ./functions/page_scraper
+      Dockerfile: Dockerfile
+
+  ActiveProxyCheckerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: python3.x
+      DockerContext: ./functions/active_proxy_checker
+      Dockerfile: Dockerfile
+
+  FbAdsLibAdScraperFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: python3.x
+      DockerContext: ./functions/ad_scraper
+      Dockerfile: Dockerfile
+
+  FbAdsLibDataCleanerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: python3.x
+      DockerContext: ./functions/data_cleaner
+      Dockerfile: Dockerfile
+
+  FbAdsLibDataStoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: python3.x
+      DockerContext: ./functions/data_store
+      Dockerfile: Dockerfile
+
+  SamV1FbAdsLibsFinalVersionStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/fbadslib_scraper.asl.json
+      Role: arn:aws:iam::171504226527:role/service-role/StepFunctions-fbAdsLibsFinalVersion-role-0cce3996
+      Type: EXPRESS
+
+Outputs:
+  FbAdsLibPageScraperFunction:
+    Description: "Page Scraper Lambda Function ARN"
+    Value: !GetAtt FbAdsLibPageScraperFunction.Arn
+  FbAdsLibPageScraperFunctionIamRole:
+    Description: "Implicit IAM Role created for Page Scraper function"
+    Value: !GetAtt FbAdsLibPageScraperFunctionRole.Arn
+  FbAdsLibAdScraperFunction:
+    Description: "Page Scraper Lambda Function ARN"
+    Value: !GetAtt FbAdsLibAdScraperFunction.Arn
+  FbAdsLibAdScraperFunctionIamRole:
+    Description: "Implicit IAM Role created for Page Scraper function"
+    Value: !GetAtt FbAdsLibAdScraperFunctionRole.Arn
+  FbAdsLibDataCleanerFunction:
+    Description: "Page Scraper Lambda Function ARN"
+    Value: !GetAtt FbAdsLibDataCleanerFunction.Arn
+  FbAdsLibDataCleanerFunctionIamRole:
+    Description: "Implicit IAM Role created for Page Scraper function"
+    Value: !GetAtt FbAdsLibDataCleanerFunctionRole.Arn
+  FbAdsLibDataStoreFunction:
+    Description: "Page Scraper Lambda Function ARN"
+    Value: !GetAtt FbAdsLibDataStoreFunction.Arn
+  FbAdsLibDataStoreFunctionIamRole:
+    Description: "Implicit IAM Role created for Page Scraper function"
+    Value: !GetAtt FbAdsLibDataStoreFunctionRole.Arn

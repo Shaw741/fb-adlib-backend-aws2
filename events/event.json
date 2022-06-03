@@ -1,0 +1,24 @@
+{
+  "statusCode": 200,
+  "cleanedAdData": {
+    "status": "Active",
+    "startDate": "2022-05-31",
+    "platforms": ["Facebook", "Instagram", "Audience Network", "Messenger"],
+    "adID": "773177030726537",
+    "noOfCopyAds": "15",
+    "adMediaURL": "https://video-lax3-2.xx.fbcdn.net/v/t42.1790-2/283372782_955165708494602_8248414014195330474_n.?_nc_cat=101&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=cK--nVoQ2kAAX92_UTd&_nc_ht=video-lax3-2.xx&oh=00_AT83pUHUeOM24M5-egWf9KoXfe4FFechm3SaWpxIxFeBEg&oe=6299FC77",
+    "adMediaType": "video",
+    "bucketMediaURL": "",
+    "adDescription": "🐾🦴\"Dogs are our link to paradise.\"They navigate the path to our hearts 💕 through their goofy smiles, warm snuggles and silly kisses.Sit and take a rest in your garden and enjoy the beautiful glow of the paw prints light.Solar powered and waterproof.Shop Now",
+    "displayURL": "WWW.BESTSOLARLIGHTING.COM",
+    "headline": "Paw Prints Solar Wind Chime",
+    "ctaStatus": "Shop Now",
+    "purchaseURL": "",
+    "purchaseDescription": "In Stock - Fast Delivery - 100% Satisfaction Guarantee - Limited Quantities Available - Hurry Before it is gone!",
+    "pageInfo": {
+      "name": "Best Solar Lighting",
+      "url": "https://www.facebook.com/bestsolarlightingshop/",
+      "logo": "https://scontent-lax3-1.xx.fbcdn.net/v/t39.35426-6/282137421_481158927033553_7082801861614235101_n.jpg?stp=dst-jpg_s60x60&_nc_cat=102&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=ful3JVadpWMAX-gBw-U&_nc_ht=scontent-lax3-1.xx&oh=00_AT-CS2XBYhPPKk8ma-VGf2vDeV-XzN3DJf0YT1eQYsV0DQ&oe=629E4F1B"
+    }
+  }
+}

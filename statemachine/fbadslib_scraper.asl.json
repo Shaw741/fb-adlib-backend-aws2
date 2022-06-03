@@ -1,0 +1,145 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "checkActiveProxies",
+  "States": {
+    "checkActiveProxies": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-ActiveProxyCheckerFunction-MmAprkQo05ot:$LATEST",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "fbAdsLibPageMap",
+      "Comment": "Lambda is created to check the active proxy"
+    },
+    "fbAdsLibPageMap": {
+      "Type": "Map",
+      "End": true,
+      "Iterator": {
+        "StartAt": "fbadslibpage lambda",
+        "States": {
+          "fbadslibpage lambda": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibPageScraperFunction-TWt7lBEE5njN:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "fbAdsLibAdMap",
+            "Comment": "Lamda for getting list of ads link from page"
+          },
+          "fbAdsLibAdMap": {
+            "Type": "Map",
+            "End": true,
+            "Iterator": {
+              "StartAt": "fbadslibad lambda",
+              "States": {
+                "fbadslibad lambda": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibAdScraperFunction-R5O3tXcul8Rv:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Comment": "lamda for scrapping detailed ad.",
+                  "Next": "Data Cleaning Lambda"
+                },
+                "Data Cleaning Lambda": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibDataCleanerFunction-TDxqgQKMFKYn:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "Ads Store Lambda",
+                  "Comment": "Lambda is used to clean the ad data",
+                  "InputPath": "$.fbAdlibItem"
+                },
+                "Ads Store Lambda": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibDataStoreFunction-ACbzvv4NlwnE:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "End": true,
+                  "Comment": "Lambda is used to store the scraper ads in elastic serach.",
+                  "InputPath": "$.cleanedAdData"
+                }
+              }
+            },
+            "InputPath": "$.fbAdlibItemList",
+            "Comment": "parallel processing for page ads"
+          }
+        }
+      },
+      "Comment": "Parallel Processing For Pages",
+      "InputPath": "$.combinedProxyPageList"
+    }
+  }
+}
