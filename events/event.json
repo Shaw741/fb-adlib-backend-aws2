@@ -1,24 +1,20 @@
 {
-  "statusCode": 200,
-  "cleanedAdData": {
-    "status": "Active",
-    "startDate": "2022-05-31",
-    "platforms": ["Facebook", "Instagram", "Audience Network", "Messenger"],
-    "adID": "773177030726537",
-    "noOfCopyAds": "15",
-    "adMediaURL": "https://video-lax3-2.xx.fbcdn.net/v/t42.1790-2/283372782_955165708494602_8248414014195330474_n.?_nc_cat=101&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=cK--nVoQ2kAAX92_UTd&_nc_ht=video-lax3-2.xx&oh=00_AT83pUHUeOM24M5-egWf9KoXfe4FFechm3SaWpxIxFeBEg&oe=6299FC77",
-    "adMediaType": "video",
-    "bucketMediaURL": "",
-    "adDescription": "🐾🦴\"Dogs are our link to paradise.\"They navigate the path to our hearts 💕 through their goofy smiles, warm snuggles and silly kisses.Sit and take a rest in your garden and enjoy the beautiful glow of the paw prints light.Solar powered and waterproof.Shop Now",
-    "displayURL": "WWW.BESTSOLARLIGHTING.COM",
-    "headline": "Paw Prints Solar Wind Chime",
-    "ctaStatus": "Shop Now",
-    "purchaseURL": "",
-    "purchaseDescription": "In Stock - Fast Delivery - 100% Satisfaction Guarantee - Limited Quantities Available - Hurry Before it is gone!",
-    "pageInfo": {
-      "name": "Best Solar Lighting",
-      "url": "https://www.facebook.com/bestsolarlightingshop/",
-      "logo": "https://scontent-lax3-1.xx.fbcdn.net/v/t39.35426-6/282137421_481158927033553_7082801861614235101_n.jpg?stp=dst-jpg_s60x60&_nc_cat=102&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=ful3JVadpWMAX-gBw-U&_nc_ht=scontent-lax3-1.xx&oh=00_AT-CS2XBYhPPKk8ma-VGf2vDeV-XzN3DJf0YT1eQYsV0DQ&oe=629E4F1B"
-    }
+  "status": "Active",
+  "startDate": "2022-05-21",
+  "platforms": [],
+  "adID": "527444998839402",
+  "noOfCopyAds": "3",
+  "adMediaURL": "https://scontent.fluk1-1.fna.fbcdn.net/v/t39.35426-6/283498854_376271001225290_6542155752688946408_n.jpg?stp=dst-jpg_s600x600&_nc_cat=111&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=psg7V3fJH74AX9vskFG&_nc_ht=scontent.fluk1-1.fna&oh=00_AT8XTutJJlbKnL9j2rsRkt_L_74zkE-R06GO2ckc4p5C0A&oe=62A49D07",
+  "adMediaType": "image",
+  "adDescription": "💃 Quilters Can't Go Without The Love Sew Wool Pressing Mat.It's This Year's Most Useful Quilting Tool🇺🇸 Ships Out From NevadaShop Now >> www.love-sew.com/products/love-sew-wool-pressing-mat",
+  "ctaStatus": "",
+  "displayURL": "",
+  "headline": "",
+  "purchaseDescription": "",
+  "purchaseURL": "https://l.facebook.com/l.php?u=https%3A%2F%2Flove-sew.com%2Fproducts%2Flove-sew-wool-pressing-mat&h=AT0ozdGaim4QLKa2S-mIhEMdapOZajkPiPKKVq0Rj66erYRaZukMvEQAIic3mmGHF5T8E4xX-H-BXTae9jUnxHJJcyDHVHUXgx8UtG0E6c-skqSqtOAISly34YFJbbU-zHhWTERvndUNfw",
+  "pageInfo": {
+    "name": "Love Sew",
+    "url": "https://www.facebook.com/lovesewonline/",
+    "logo": "https://scontent.fluk1-1.fna.fbcdn.net/v/t39.35426-6/283439073_550245046499051_1229467443143120591_n.jpg?stp=dst-jpg_s60x60&_nc_cat=102&ccb=1-7&_nc_sid=cf96c8&_nc_ohc=YIMe0uINlZoAX-c2uFn&_nc_ht=scontent.fluk1-1.fna&oh=00_AT85eYEtzqnz9aHefmSgsLsjYTEQflVbaKD9k6LF8uP4FQ&oe=62A4FA94"
   }
 }

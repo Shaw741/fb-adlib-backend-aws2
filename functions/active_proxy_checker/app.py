@@ -55,13 +55,13 @@ class ActiveProxyChecker:
 def lambda_handler(event, context):
     start_time = datetime.now()
 
-    activeProxyChecker = ActiveProxyChecker()
-    activeProxyList = activeProxyChecker.process_proxies(event["proxyUrls"])
+    # activeProxyChecker = ActiveProxyChecker()
+    # activeProxyList = activeProxyChecker.process_proxies(event["proxyUrls"])
 
     combinedProxyPageList = []
     for page in event["fbadslibpages"]:
         pageProxies = {}
-        pageProxies["activeProxies"] = activeProxyList
+        pageProxies["activeProxies"] = event["proxyUrls"]
         pageProxies["pageURL"] = page
         combinedProxyPageList.append(pageProxies)
 

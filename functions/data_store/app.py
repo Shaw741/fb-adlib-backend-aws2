@@ -1,29 +1,53 @@
-import json
-from tempfile import mkdtemp
+from opensearchpy import OpenSearch, RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
+import boto3
 import requests
 import hashlib
 import uuid
-from elasticsearch import Elasticsearch
-import boto3
 
 class FbAdsLibDataStore:
 
     def __init__(self):
-        self.s3 = boto3.client(
-            service_name='s3',
-            region_name='us-east-1',
-            aws_access_key_id='AKIASP3TS2DPZRHM2DBG',
-            aws_secret_access_key='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'
-            )
 
-        # self.s3 =boto3.client("s3")
-
-        self.es=Elasticsearch(['https://search-testfbadslib-arkod77br4pscry5r4hqaacnfy.us-east-1.es.amazonaws.com/'],
-                              http_auth=('jeylearner2022','Jey@aws1290'))
-
-        self.es.indices.create(index='scraping_project',ignore=400)
-        print(self.es.ping())
+        region = 'us-east-1'
+        host = 'search-testfbadslib-arkod77br4pscry5r4hqaacnfy.us-east-1.es.amazonaws.com'
+        service = 'es'
         self.bucket_name = "fbadlibtest"
+        self.index_name = 'fbadslib'
+        
+        credentials = boto3.Session().get_credentials()
+
+        self.s3 = boto3.client("s3")
+        # self.s3 = boto3.client(
+        #     service_name='s3',
+        #     region_name=region,
+        #     aws_access_key_id=credentials.access_key,
+        #     aws_secret_access_key=credentials.secret_key
+        #     )
+
+        awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
+
+        self.client = OpenSearch(
+                        hosts = [{'host': host, 'port': 443}],
+                        http_auth = awsauth,
+                        use_ssl = True,
+                        verify_certs = True,
+                        connection_class = RequestsHttpConnection
+                        )
+        
+        self.es_create_index_if_not_exists(self.index_name)
+
+    def es_create_index_if_not_exists(self,index):
+        """Create the given ElasticSearch index and ignore error if it already exists"""
+        try:
+            self.client.indices.create(index)
+        except Exception as ex:
+            print(ex)
+            if ex.error == 'resource_already_exists_exception':
+                pass # Index already exists. Ignore.
+            else: # Other exception - raise it
+                raise ex
+            
 
     def generate_hash(self, fbAdlibItem):
 
@@ -60,16 +84,21 @@ class FbAdsLibDataStore:
         self.s3.upload_fileobj(mediaResponse, self.bucket_name, fbAdlibItem['adMediaType']+'/'+filename)
 
         s3_url = f'https://{self.bucket_name}.s3.amazonaws.com/'+fbAdlibItem['adMediaType']+f'/{filename}'
-
-        # where we are storing s3 url + why deleting pageInfo ?
-        del fbAdlibItem['pageInfo']
+        fbAdlibItem['bucketMediaURL'] = s3_url
         
-        res=self.es.index(index="scraping_project", body=fbAdlibItem, ignore=400)
-        
-        return
+        try:
+            res=self.client.index(index=self.index_name, body=fbAdlibItem, refresh = True)
+            print("Record created successfully !!!!!")
+        except Exception as e:
+            print("Exception Occured while creating an Ad to Elastic Search :")
+            print(e)
+        finally:
+            return
+        return res
 
     def update_ad(self, oldFbAdlibItem, updateQuery):
-        # why we can't use Hash to update record ?
+        print("Update Query ::::" + updateQuery)
+        print("oldFbAdlibItem adID ::::" + oldFbAdlibItem["adID"])
         query1={
                 "script":{
                     "inline":updateQuery,
@@ -88,14 +117,12 @@ class FbAdsLibDataStore:
                     }
             }
 
-        # Why same thing in both try and ex except ?
         try:
-            query_res=self.es.update_by_query(index="scraping_project",body=query1)
+            query_res=self.client.update_by_query(index=self.index_name,body=query1, refresh = True)
             print("Record updated successfully !!!!!")
-            print(query_res["updated"])
         except Exception as e:
-            self.es.indices.refresh(index = "scraping_project")
-            query_res=self.es.update_by_query(index="scraping_project",body=query1)
+            print("Exception Occured while updating an Ad to Elastic Search :")
+            print(e)
         finally:
             return
 
@@ -108,7 +135,7 @@ class FbAdsLibDataStore:
               "must": [
                 {
                   "match": {
-                    "hash.keyword": newFbAdlibItem["hash"]
+                    "hash": newFbAdlibItem["hash"]
                   }
                 }
               ]
@@ -116,31 +143,34 @@ class FbAdsLibDataStore:
           }
         }
 
-        result=self.es.search(index="scraping_project", body=query)
-
-        if result["hits"]["hits"]:
-            hits_data=result["hits"]["hits"][0]["_source"]
-
-            if hits_data["status"]==newFbAdlibItem["status"] and hits_data["adMediaURL"]==newFbAdlibItem["adMediaURL"]:
-
-                self.update_ad(hits_data, "ctx._source.noOfCopyAds={}".format(newFbAdlibItem['noOfCopyAds']))
-                
-            if hits_data["status"]==newFbAdlibItem["status"] and hits_data["adMediaURL"]!=newFbAdlibItem["adMediaURL"]:
-
-                self.update_ad(hits_data, "ctx._source.status='Inactive'")
-                self.create_new_ad(newFbAdlibItem)
-                    
-            if hits_data["status"]!=newFbAdlibItem["status"] and hits_data["status"]=="Inactive" and hits_data["adMediaURL"]==newFbAdlibItem["adMediaURL"]:
-
-                self.update_ad(hits_data, "ctx._source.status='Active';ctx._source.noOfCopyAds={}".format(i['noOfCopyAds']))
-            
+        result=self.client.search(index=self.index_name, body=query)
+        
+        if len(result['hits']['hits']) > 0:
+            """Hash Matched go for media url match"""
+            for storedAdData in result['hits']['hits']:
+                storedAd = storedAdData["_source"]
+                if storedAd['adMediaURL'] == newFbAdlibItem['adMediaURL']:
+                    """Media URL is also matched go for Status Check!!"""
+                    if storedAd["status"] == 'Active':
+                        """Just Update No. Of ads and finish !!"""
+                        self.update_ad(storedAd, "ctx._source.noOfCopyAds={}".format(newFbAdlibItem['noOfCopyAds']))
+                    elif storedAd["status"] == 'Inactive':
+                        """Make it Active and update ad count!!"""
+                        self.update_ad(storedAd, "ctx._source.status='Active';ctx._source.noOfCopyAds={}".format(newFbAdlibItem['noOfCopyAds']))
+                else:
+                    """Media URL is not matched now go for Status Check!!"""
+                    if storedAd["status"] == 'Active':
+                        """Make Active ad as Inactive"""
+                        """Create new ad"""
+                        self.update_ad(storedAd, "ctx._source.status=='Inactive'")
+                        self.create_new_ad(newFbAdlibItem)
         else:
             self.create_new_ad(newFbAdlibItem)
 
 def lambda_handler(event, context):
 
     fbAdsLibDataStore = FbAdsLibDataStore()
-    fbAdsLibDataStore.save_ad(event["cleanedAdData"])
+    fbAdsLibDataStore.save_ad(event) 
 
     return {
         "statusCode": 200

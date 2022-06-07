@@ -3,12 +3,19 @@ from datetime import datetime
 
 def lambda_handler(event, context):
 
-    adDataToBeCleaned = event["fbAdlibItem"]
+    adDataToBeCleaned = event
     #Formatting Start Date.
     adDataToBeCleaned["startDate"] = adDataToBeCleaned["startDate"].replace("Started running on","").strip()
-    d,m,y=adDataToBeCleaned["startDate"].split(" ")
+    m,d,y=adDataToBeCleaned["startDate"].split(" ")
+    d= d.replace(',', '').strip()
     my_date_string = f"{m} {d} {y}"
-    date_time_obj = datetime.strptime(my_date_string, '%b %d %Y')
+    try:
+        date_time_obj = datetime.strptime(my_date_string, '%b %d %Y')
+    except:
+        d,m,y=adDataToBeCleaned["startDate"].split(" ")
+        d= d.replace(',', '').strip()
+        my_date_string = f"{m} {d} {y}"
+        date_time_obj = datetime.strptime(my_date_string, '%b %d %Y')
     adDataToBeCleaned["startDate"] = date_time_obj.strftime("%Y-%m-%d")
 
     #noOfCopyAds
