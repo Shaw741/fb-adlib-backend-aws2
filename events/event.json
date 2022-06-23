@@ -11,5 +11,11 @@
     "107.150.42.146:19017",
     "198.204.249.42:19020"
   ],
-  "pageURL": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=101672787924056&search_type=page&media_type=all"
+  "fbAdlibItem": {
+    "status": "Active",
+    "startDate": "Started running on Nov 9, 2021",
+    "platforms": ["Facebook", "Instagram", "Audience Network", "Messenger"],
+    "adID": "489156002205230",
+    "noOfCopyAds": "0"
+  }
 }

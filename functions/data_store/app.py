@@ -48,7 +48,6 @@ class FbAdsLibDataStore:
             else: # Other exception - raise it
                 raise ex
             
-
     def generate_hash(self, fbAdlibItem):
 
         # Get Data from media URL.

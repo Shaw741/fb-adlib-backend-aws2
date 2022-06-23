@@ -77,8 +77,8 @@ class FbAdLibAdSpider:
                 return detailedDriver
             except Exception as ex:
                 print("Not Working just remove the IP from list and proceed for next")
-                self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Failure_" +  str(count) + '.png')
-                print('Image Saved in S3 bucket!!!')
+                # self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Failure_" +  str(count) + '.png')
+                # print('Image Saved in S3 bucket!!!')
                 self.proxylist.remove(self.proxyToBeUsed)
                 detailedDriver.quit()
                 print(ex)
@@ -91,116 +91,118 @@ class FbAdLibAdSpider:
 
 
     def process_ad(self, fbAdlibItem):
-        try:
-            fbAdlibItem["adMediaURL"] = ""
-            fbAdlibItem["adMediaType"] = ""
-            fbAdlibItem["adDescription"] = ""
-            fbAdlibItem["ctaStatus"] = ""
-            fbAdlibItem["displayURL"] = ""
-            fbAdlibItem["headline"]   = ""
-            fbAdlibItem["purchaseDescription"] = ""
-            fbAdlibItem["purchaseURL"] = ""
-            pageInfo = {
-                "name": "",
-                "url" : "",
-                "logo": ""
-            }
-            fbAdlibItem["pageInfo"] = pageInfo
+        fbAdlibItem["adMediaURL"] = ""
+        fbAdlibItem["adMediaType"] = ""
+        fbAdlibItem["adDescription"] = ""
+        fbAdlibItem["ctaStatus"] = ""
+        fbAdlibItem["displayURL"] = ""
+        fbAdlibItem["headline"]   = ""
+        fbAdlibItem["purchaseDescription"] = ""
+        fbAdlibItem["purchaseURL"] = ""
+        pageInfo = {
+            "name": "",
+            "url" : "",
+            "logo": ""
+        }
+        fbAdlibItem["pageInfo"] = pageInfo
 
-            print("adURL scrapped :- ", fbAdlibItem["adID"])
-            detailedDriver  = self.polling_for_driver(fbAdlibItem)
-                
-            detailedDriver.find_element_by_xpath("//div [contains( text(), 'See ad details')]").click()
-            time.sleep(60)
-            self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Success" + '.png')
-            
-            for link in detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_elements_by_tag_name("a"):
+        print("adURL scrapped :- ", fbAdlibItem["adID"])
 
-                try:
-                    fbAdlibItem["adMediaURL"] = link.find_element_by_tag_name("img").get_attribute('src')
-                    fbAdlibItem["adMediaType"] = 'image'
-                    break
-                except Exception as e:
-                    print("Exception while adMediaURL Image")
-                    #print(e)
-    
-            if fbAdlibItem["adMediaURL"] == "":
-                try:
-                    fbAdlibItem["adMediaURL"] = detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_element_by_tag_name('video').get_attribute('src')
-                    fbAdlibItem["adMediaType"] = "video"
-                except Exception as e:
-                    print("Exception while adMediaURL Video")
-                    #print(e)
-    
+        detailedDriver  = self.get_chrome_driver_instance()
+        adUrl = "https://www.facebook.com/ads/library/?id=" + fbAdlibItem["adID"]
+        detailedDriver.get(adUrl)
+        element = WebDriverWait(detailedDriver, 60).until(EC.presence_of_element_located((By.XPATH, "//div [contains( text(), 'See ad details')]")))
             
-            try:
-                fbAdlibItem["adDescription"] = detailedDriver.find_element_by_css_selector(".qi2u98y8.n6ukeyzl").find_element_by_css_selector('.n54jr4lg ._4ik5').text
-            except Exception as e:
-                print("Exception while adDescription")
-                #print(e)
-    
-            
-            try:
-                fbAdlibItem["ctaStatus"] = detailedDriver.find_element_by_css_selector("._8jg_").find_element_by_css_selector(".duy2mlcu").text
-            except Exception as e:
-                print("Exception while ctaStatus")
-                #print(e)
-    
-
-            try:
-                for idx, info in enumerate(detailedDriver.find_element_by_css_selector("._8jg_").find_elements_by_css_selector("._4ik5")): 
-                    if idx == 0:
-                        fbAdlibItem["displayURL"] = info.text
-                    if idx == 1:
-                        fbAdlibItem["headline"] = info.text
-                    if idx == 2:
-                        fbAdlibItem["purchaseDescription"] = info.text
-            except Exception as e:
-                print("Exception while Ads Headline")
-                #print(e)
-    
+        detailedDriver.find_element_by_xpath("//div [contains( text(), 'See ad details')]").click()
+        element = WebDriverWait(detailedDriver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.effa2scm > .qi2u98y8')))
+        # self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Success" + '.png')
         
+        for link in detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_elements_by_tag_name("a"):
+
             try:
-                fbAdlibItem["purchaseURL"] = detailedDriver.find_element_by_css_selector('.qi2u98y8.n6ukeyzl').find_elements_by_tag_name('a')[2].get_attribute('href')
+                fbAdlibItem["adMediaURL"] = link.find_element_by_tag_name("img").get_attribute('src')
+                fbAdlibItem["adMediaType"] = 'image'
+                break
             except Exception as e:
-                print("Exception while Ads purchaseURL")
+                print("Exception while adMediaURL Image")
                 #print(e)
-    
-            ##### Scrape Page Info
-            
+
+        if fbAdlibItem["adMediaURL"] == "":
             try:
-                pageInfo["name"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').text
+                fbAdlibItem["adMediaURL"] = detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_element_by_tag_name('video').get_attribute('src')
+                fbAdlibItem["adMediaType"] = "video"
             except Exception as e:
-                print("Exception while pageInfo name")
+                print("Exception while adMediaURL Video")
                 #print(e)
-                pageInfo["name"] = ""
-            try:
-                pageInfo["url"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').get_attribute('href')
-            except Exception as e:
-                print("Exception while pageInfo url")
-                #print(e)
-                pageInfo["url"] = ""
-            try:
-                pageInfo["logo"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('img').get_attribute('src')
-            except Exception as e:
-                print("Exception while pageInfo logo")
-                #print(e)
-                pageInfo["logo"] = ""
-    
-            fbAdlibItem["pageInfo"] = pageInfo
-            # try:
-            #     line = json.dumps(fbAdlibItem.__dict__) + ","
-            #     print(line)
-            #     self.file.write(line)
-            # except Exception as e:
-            #     print("Error while saving data to file :")
-            #     #print(e)
+
+        
+        try:
+            fbAdlibItem["adDescription"] = detailedDriver.find_element_by_css_selector(".qi2u98y8.n6ukeyzl").find_element_by_css_selector('.n54jr4lg ._4ik5').text
         except Exception as e:
-            print("Exception while scraping an AD with ID :- " +  fbAdlibItem["adID"])
+            print("Exception while adDescription")
             #print(e)
-        finally:
-            detailedDriver.quit()
-            return fbAdlibItem
+
+        
+        try:
+            fbAdlibItem["ctaStatus"] = detailedDriver.find_element_by_css_selector("._8jg_").find_element_by_css_selector(".duy2mlcu").text
+        except Exception as e:
+            print("Exception while ctaStatus")
+            #print(e)
+
+
+        try:
+            for idx, info in enumerate(detailedDriver.find_element_by_css_selector("._8jg_").find_elements_by_css_selector("._4ik5")): 
+                if idx == 0:
+                    fbAdlibItem["displayURL"] = info.text
+                if idx == 1:
+                    fbAdlibItem["headline"] = info.text
+                if idx == 2:
+                    fbAdlibItem["purchaseDescription"] = info.text
+        except Exception as e:
+            print("Exception while Ads Headline")
+            #print(e)
+
+    
+        try:
+            fbAdlibItem["purchaseURL"] = detailedDriver.find_element_by_css_selector('.qi2u98y8.n6ukeyzl').find_elements_by_tag_name('a')[2].get_attribute('href')
+        except Exception as e:
+            print("Exception while Ads purchaseURL")
+            #print(e)
+
+        ##### Scrape Page Info
+        
+        try:
+            pageInfo["name"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').text
+        except Exception as e:
+            print("Exception while pageInfo name")
+            #print(e)
+            pageInfo["name"] = ""
+        
+        try:
+            pageInfo["url"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').get_attribute('href')
+        except Exception as e:
+            print("Exception while pageInfo url")
+            #print(e)
+            pageInfo["url"] = ""
+        
+        try:
+            pageInfo["logo"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('img').get_attribute('src')
+        except Exception as e:
+            print("Exception while pageInfo logo")
+            #print(e)
+            pageInfo["logo"] = ""
+
+        fbAdlibItem["pageInfo"] = pageInfo
+        # try:
+        #     line = json.dumps(fbAdlibItem.__dict__) + ","
+        #     print(line)
+        #     self.file.write(line)
+        # except Exception as e:
+        #     print("Error while saving data to file :")
+        #     #print(e)
+        detailedDriver.quit()
+        return fbAdlibItem
+            
 
 
 def lambda_handler(event, context):
