@@ -65,7 +65,7 @@ class FbAdLibAdSpider:
                 element = WebDriverWait(detailedDriver, 60).until(EC.presence_of_element_located((By.XPATH, "//div [contains( text(), 'See ad details')]")))
                 print("Working !!!!")
                 # time.sleep(120)
-                self.takeScreenShot(detailedDriver, 'adDriverSuccess' + str(count) + '.png')
+                # self.takeScreenShot(detailedDriver, 'adDriverSuccess' + str(count) + '.png')
                 print('Image Saved in S3 bucket!!!')
                 # time.sleep(120)
                 # self.takeScreenShot(detailedDriver, 'adDriver' + str(count) + '.png')
@@ -77,7 +77,7 @@ class FbAdLibAdSpider:
                 return detailedDriver
             except Exception as ex:
                 print("Not Working just remove the IP from list and proceed for next")
-                self.takeScreenShot(detailedDriver, 'adDriverFailed' + str(count) + '.png')
+                self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Failure_" +  str(count) + '.png')
                 print('Image Saved in S3 bucket!!!')
                 self.proxylist.remove(self.proxyToBeUsed)
                 detailedDriver.quit()
@@ -105,13 +105,15 @@ class FbAdLibAdSpider:
                 "url" : "",
                 "logo": ""
             }
+            fbAdlibItem["pageInfo"] = pageInfo
 
             print("adURL scrapped :- ", fbAdlibItem["adID"])
             detailedDriver  = self.polling_for_driver(fbAdlibItem)
                 
             detailedDriver.find_element_by_xpath("//div [contains( text(), 'See ad details')]").click()
             time.sleep(60)
-            fbAdlibItem["pageInfo"] = pageInfo
+            self.takeScreenShot(detailedDriver, str(fbAdlibItem["adID"]) + "_Success" + '.png')
+            
             for link in detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_elements_by_tag_name("a"):
 
                 try:

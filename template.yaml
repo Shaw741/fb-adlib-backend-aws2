@@ -69,7 +69,7 @@ Resources:
       DockerContext: ./functions/data_store
       Dockerfile: Dockerfile
 
-  FbAdsLibsStateMachine:
+  FbAdsLibStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: statemachine/fbadslib_scraper.asl.json
