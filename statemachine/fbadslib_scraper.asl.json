@@ -7,7 +7,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-ActiveProxyCheckerFunction-MmAprkQo05ot:$LATEST",
+        "FunctionName": "arn:aws:lambda:us-east-1:257097519918:function:fbadslib-prod-ActiveProxyCheckerFunction-8KSPrUMtoRwi:$LATEST",
         "Payload.$": "$"
       },
       "Retry": [
@@ -37,7 +37,7 @@
             "OutputPath": "$.Payload",
             "Parameters": {
               "Payload.$": "$",
-              "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibPageScraperFunction-TWt7lBEE5njN:$LATEST"
+              "FunctionName": "arn:aws:lambda:us-east-1:257097519918:function:fbadslib-prod-FbAdsLibPageScraperFunction-QDM2Ddh04Fki:$LATEST"
             },
             "Retry": [
               {
@@ -66,7 +66,7 @@
                   "OutputPath": "$.Payload",
                   "Parameters": {
                     "Payload.$": "$",
-                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibAdScraperFunction-R5O3tXcul8Rv:$LATEST"
+                    "FunctionName": "arn:aws:lambda:us-east-1:257097519918:function:fbadslib-prod-FbAdsLibAdScraperFunction-2cas1pegXxON:$LATEST"
                   },
                   "Retry": [
                     {
@@ -89,7 +89,7 @@
                   "OutputPath": "$.Payload",
                   "Parameters": {
                     "Payload.$": "$",
-                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibDataCleanerFunction-TDxqgQKMFKYn:$LATEST"
+                    "FunctionName": "arn:aws:lambda:us-east-1:257097519918:function:fbadslib-prod-FbAdsLibDataCleanerFunction-hTbHiSGNvy8E:$LATEST"
                   },
                   "Retry": [
                     {
@@ -113,7 +113,7 @@
                   "OutputPath": "$.Payload",
                   "Parameters": {
                     "Payload.$": "$",
-                    "FunctionName": "arn:aws:lambda:us-east-1:171504226527:function:fbadslib-FbAdsLibDataStoreFunction-ACbzvv4NlwnE:$LATEST"
+                    "FunctionName": "arn:aws:lambda:us-east-1:257097519918:function:fbadslib-prod-FbAdsLibDataStoreFunction-eakJ5nPumYs2:$LATEST"
                   },
                   "Retry": [
                     {
@@ -134,12 +134,14 @@
               }
             },
             "InputPath": "$.fbAdlibItemList",
-            "Comment": "parallel processing for page ads"
+            "Comment": "parallel processing for page ads",
+            "MaxConcurrency": 10
           }
         }
       },
       "Comment": "Parallel Processing For Pages",
-      "InputPath": "$.combinedProxyPageList"
+      "InputPath": "$.combinedProxyPageList",
+      "MaxConcurrency": 10
     }
   }
 }

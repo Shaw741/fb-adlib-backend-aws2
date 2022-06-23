@@ -1,13 +1,12 @@
-from datetime import datetime
 import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, OperatingSystem
 import boto3
 import time
+# from random_user_agent.user_agent import UserAgent
+# from random_user_agent.params import SoftwareName, OperatingSystem
 
 class FbAdLibAdSpider:
     
@@ -15,6 +14,13 @@ class FbAdLibAdSpider:
         self.proxylist = proxyList
         self.maxPollingCount = 10
         self.proxyToBeUsed = ''
+        self.bucket_name = "fbadslib-dev"
+
+    def takeScreenShot(self, currentDriver, ss_name):
+        screenshot_path = "/tmp/" + ss_name
+        currentDriver.save_screenshot(screenshot_path)
+        s3 = boto3.client("s3")
+        s3.put_object(Bucket=self.bucket_name, Key=ss_name, Body=open(screenshot_path, "rb"))
     
     def get_chrome_driver_instance(self):
         options = webdriver.ChromeOptions()
@@ -22,7 +28,7 @@ class FbAdLibAdSpider:
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument("--disable-gpu")
-        options.add_argument('--window-size=1440x360')
+        options.add_argument('--window-size=1440x626')
         options.add_argument("--disable-extensions")
         options.add_argument("--single-process")
         options.add_argument("--disable-dev-shm-usage")
@@ -52,11 +58,17 @@ class FbAdLibAdSpider:
             print(count)
             try:
                 adUrl = "https://www.facebook.com/ads/library/?id=" + fbAdlibItem["adID"]
+                # adUrl = "https://www.google.com/"
                 print("adURL scrapped :- ", adUrl)
                 detailedDriver  = self.get_chrome_driver_instance()
                 detailedDriver.get(adUrl)
                 element = WebDriverWait(detailedDriver, 60).until(EC.presence_of_element_located((By.XPATH, "//div [contains( text(), 'See ad details')]")))
                 print("Working !!!!")
+                # time.sleep(120)
+                self.takeScreenShot(detailedDriver, 'adDriverSuccess' + str(count) + '.png')
+                print('Image Saved in S3 bucket!!!')
+                # time.sleep(120)
+                # self.takeScreenShot(detailedDriver, 'adDriver' + str(count) + '.png')
                 # screenshot_filename = "adsScraper.png"
                 # screenshot_path = "/tmp/" + screenshot_filename
                 # detailedDriver.save_screenshot(screenshot_path)
@@ -65,10 +77,18 @@ class FbAdLibAdSpider:
                 return detailedDriver
             except Exception as ex:
                 print("Not Working just remove the IP from list and proceed for next")
+                self.takeScreenShot(detailedDriver, 'adDriverFailed' + str(count) + '.png')
+                print('Image Saved in S3 bucket!!!')
                 self.proxylist.remove(self.proxyToBeUsed)
-                print(ex)
                 detailedDriver.quit()
+                print(ex)
+                # pass
+            finally:
+                # self.takeScreenShot(detailedDriver, 'adDriverFinal' + str(count) + '.png')
+                # detailedDriver.quit()
+                # break
                 pass
+
 
     def process_ad(self, fbAdlibItem):
         try:
@@ -85,23 +105,11 @@ class FbAdLibAdSpider:
                 "url" : "",
                 "logo": ""
             }
-            # adUrl = "https://www.facebook.com/ads/library/?id=" + fbAdlibItem["adID"]
-            # print("adURL scrapped :- ", adUrl)
+
+            print("adURL scrapped :- ", fbAdlibItem["adID"])
             detailedDriver  = self.polling_for_driver(fbAdlibItem)
-            print("SuccessFully Get the driver")
-            # detailedDriver.get(adUrl)
-            # time.sleep(30)
-            # Wait for Details to be loaded
-            # try:
-            #     element = WebDriverWait(detailedDriver, 600).until(EC.presence_of_element_located((By.XPATH, "//div [contains( text(), 'See ad details')]")))
-            # except:
                 
             detailedDriver.find_element_by_xpath("//div [contains( text(), 'See ad details')]").click()
-            # screenshot_filename = "adsScraper.png"
-            # screenshot_path = "/tmp/" + screenshot_filename
-            # detailedDriver.save_screenshot(screenshot_path)
-            # s3 = boto3.client("s3")
-            # s3.put_object(Bucket="fbadlibtest", Key=screenshot_filename, Body=open(screenshot_path, "rb"))
             time.sleep(60)
             fbAdlibItem["pageInfo"] = pageInfo
             for link in detailedDriver.find_element_by_css_selector('.effa2scm > .qi2u98y8').find_elements_by_tag_name("a"):
@@ -112,7 +120,7 @@ class FbAdLibAdSpider:
                     break
                 except Exception as e:
                     print("Exception while adMediaURL Image")
-                    print(e)
+                    #print(e)
     
             if fbAdlibItem["adMediaURL"] == "":
                 try:
@@ -120,26 +128,22 @@ class FbAdLibAdSpider:
                     fbAdlibItem["adMediaType"] = "video"
                 except Exception as e:
                     print("Exception while adMediaURL Video")
-                    print(e)
+                    #print(e)
     
             
-
             try:
                 fbAdlibItem["adDescription"] = detailedDriver.find_element_by_css_selector(".qi2u98y8.n6ukeyzl").find_element_by_css_selector('.n54jr4lg ._4ik5').text
             except Exception as e:
                 print("Exception while adDescription")
-                print(e)
+                #print(e)
     
             
-
             try:
                 fbAdlibItem["ctaStatus"] = detailedDriver.find_element_by_css_selector("._8jg_").find_element_by_css_selector(".duy2mlcu").text
             except Exception as e:
                 print("Exception while ctaStatus")
-                print(e)
+                #print(e)
     
-
-            
 
             try:
                 for idx, info in enumerate(detailedDriver.find_element_by_css_selector("._8jg_").find_elements_by_css_selector("._4ik5")): 
@@ -151,15 +155,14 @@ class FbAdLibAdSpider:
                         fbAdlibItem["purchaseDescription"] = info.text
             except Exception as e:
                 print("Exception while Ads Headline")
-                print(e)
+                #print(e)
     
-            
-
+        
             try:
                 fbAdlibItem["purchaseURL"] = detailedDriver.find_element_by_css_selector('.qi2u98y8.n6ukeyzl').find_elements_by_tag_name('a')[2].get_attribute('href')
             except Exception as e:
                 print("Exception while Ads purchaseURL")
-                print(e)
+                #print(e)
     
             ##### Scrape Page Info
             
@@ -167,19 +170,19 @@ class FbAdLibAdSpider:
                 pageInfo["name"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').text
             except Exception as e:
                 print("Exception while pageInfo name")
-                print(e)
+                #print(e)
                 pageInfo["name"] = ""
             try:
                 pageInfo["url"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('a').get_attribute('href')
             except Exception as e:
                 print("Exception while pageInfo url")
-                print(e)
+                #print(e)
                 pageInfo["url"] = ""
             try:
                 pageInfo["logo"] = detailedDriver.find_element_by_css_selector(".jbmj41m4").find_element_by_tag_name('img').get_attribute('src')
             except Exception as e:
                 print("Exception while pageInfo logo")
-                print(e)
+                #print(e)
                 pageInfo["logo"] = ""
     
             fbAdlibItem["pageInfo"] = pageInfo
@@ -189,23 +192,19 @@ class FbAdLibAdSpider:
             #     self.file.write(line)
             # except Exception as e:
             #     print("Error while saving data to file :")
-            #     print(e)
+            #     #print(e)
         except Exception as e:
-            print(e)
+            print("Exception while scraping an AD with ID :- " +  fbAdlibItem["adID"])
+            #print(e)
         finally:
             detailedDriver.quit()
             return fbAdlibItem
 
 
 def lambda_handler(event, context):
-    start_time = datetime.now()
+
     fbAdLibAdSpider = FbAdLibAdSpider(event["activeProxies"])
-
     fbAdlibItem = fbAdLibAdSpider.process_ad(event['fbAdlibItem'])
-
-    end_time = datetime.now()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed run time: {elapsed_time} seconds")
 
     return {
         "statusCode": 200,

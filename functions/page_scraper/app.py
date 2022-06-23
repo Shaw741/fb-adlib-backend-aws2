@@ -1,14 +1,13 @@
-from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import random
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, OperatingSystem
-# import requests
 import boto3
 import time
+# from random_user_agent.user_agent import UserAgent
+# from random_user_agent.params import SoftwareName, OperatingSystem
+# import requests
 # import io
 
 class FbAdLibPageSpider:
@@ -17,6 +16,13 @@ class FbAdLibPageSpider:
         self.proxylist = proxylist
         self.proxyToBeUsed = ''
         self.maxPollingCount = 10
+        self.bucket_name = "fbadslib-dev"
+
+    def takeScreenShot(self, currentDriver, ss_name):
+        screenshot_path = "/tmp/" + ss_name
+        currentDriver.save_screenshot(screenshot_path)
+        s3 = boto3.client("s3")
+        s3.put_object(Bucket=self.bucket_name, Key=ss_name, Body=open(screenshot_path, "rb"))
     
     def get_chrome_driver_instance(self):
 
@@ -25,7 +31,7 @@ class FbAdLibPageSpider:
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument("--disable-gpu")
-        options.add_argument('--window-size=1440x360')
+        options.add_argument('--window-size=1440x626')
         options.add_argument("--disable-extensions")
         options.add_argument("--single-process")
         options.add_argument("--disable-dev-shm-usage")
@@ -33,10 +39,11 @@ class FbAdLibPageSpider:
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--allow-running-insecure-content')
         options.add_argument("--no-zygote")
-        options.add_experimental_option("useAutomationExtension", False)  # Adding Argument to Not Use Automation Extension
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])  # Excluding enable-automation Switch
+        options.add_experimental_option("useAutomationExtension", False)
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_argument("disable-popup-blocking")
         options.add_argument("disable-notifications")
+
         self.proxyToBeUsed=random.choice(self.proxylist)
         options.add_argument('--proxy-server=%s' % self.proxyToBeUsed)
 
@@ -51,38 +58,32 @@ class FbAdLibPageSpider:
 
     def polling_for_driver(self, pageUrl):
         for count in range(self.maxPollingCount):
-            print(count)
+            print("No. of attempts :- " + str(count))
+            print("pageURL scrapped :- ", pageUrl)
             try:
-                print("pageURL scrapped :- ", pageUrl)
                 currentDriver  = self.get_chrome_driver_instance()
                 currentDriver.get(pageUrl)
-                element = WebDriverWait(currentDriver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
+                print("Driver Initialize successfully !!!")
+                element = WebDriverWait(currentDriver, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
+                self.takeScreenShot(currentDriver, 'pageDriver' + str(count) + '.png')
+                print('Image Saved in S3 bucket!!!')
                 print("Working !!!!")
-                # screenshot_filename = "pageScraper.png"
-                # screenshot_path = "/tmp/" + screenshot_filename
-                # currentDriver.save_screenshot(screenshot_path)
-                # s3 = boto3.client("s3")
-                # s3.put_object(Bucket="fbadlibtest", Key='pageURL' + str(count) + '.png', Body=open(screenshot_path, "rb"))
                 return currentDriver
             except Exception as ex:
                 print("Not Working just remove the IP from list and proceed for next")
                 self.proxylist.remove(self.proxyToBeUsed)
+                self.takeScreenShot(currentDriver, 'pageDriver' + str(count) + '.png')
+                print('Image Saved in S3 bucket!!!')
                 print(ex)
                 currentDriver.quit()
+            finally:
                 pass
 
     def process_page(self, pageUrl):
-
+        print("Page URL to be scraped :- " + pageUrl)
         fbAdLibItemList = []
         try:
-            print("Scraping Page -: " + pageUrl )
             currentDriver  = self.polling_for_driver(pageUrl)
-            # screenshot_filename = "screenshot11.png"
-            # screenshot_path = "/tmp/" + screenshot_filename
-            # currentDriver.save_screenshot(screenshot_path)
-            # s3 = boto3.client("s3")
-            # s3.put_object(Bucket="fbadlibtest", Key=screenshot_filename, Body=open(screenshot_path, "rb"))
-            # print("ScreenShot is available!!!!!!")
             # Wait for List of Ads
             try:
                 # Get List Of Ads.
@@ -150,21 +151,19 @@ class FbAdLibPageSpider:
                         #print(e)
                     fbAdLibItemList.append(fbAdlibItem)
             except Exception as e:
-                print(e)
+                print("Exception Occured While Scrapping list of ads from page :" + pageUrl)
+                # print(e)
             finally:
                 currentDriver.quit()
         
         except Exception as e:
             print("Exception Occured While Scrapping page :" + pageUrl)
             print(str(e))
-
         finally:
-            print(fbAdLibItemList)
             return fbAdLibItemList
 
 def lambda_handler(event, context):
-    print(event)
-    start_time = datetime.now()
+
     fbAdLibPageSpider = FbAdLibPageSpider(event["activeProxies"])
     fbAdLibItemList = fbAdLibPageSpider.process_page(event["pageURL"])
 
@@ -174,10 +173,6 @@ def lambda_handler(event, context):
         adProxies["activeProxies"] = event["activeProxies"]
         adProxies["fbAdlibItem"] = fbAdLibItem
         combinedProxyAdList.append(adProxies)
-
-    end_time = datetime.now()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed run time: {elapsed_time} seconds")
 
     return {
         "statusCode": 200,

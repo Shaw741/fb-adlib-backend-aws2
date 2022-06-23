@@ -1,12 +1,12 @@
 version = 0.1
-[default]
-[default.deploy]
-[default.deploy.parameters]
-stack_name = "fbadslib"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1k1dmy9io24xu"
-s3_prefix = "fbadslib"
+[prod]
+[prod.deploy]
+[prod.deploy.parameters]
+stack_name = "fbadslib-prod"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1k1sftxxooqv0"
+s3_prefix = "fbadslib-prod"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 disable_rollback = true
-image_repositories = ["FbAdsLibPageScraperFunction=171504226527.dkr.ecr.us-east-1.amazonaws.com/fbadslibc84e822f/fbadslibpagescraperfunction5381f075repo", "FbAdsLibAdScraperFunction=171504226527.dkr.ecr.us-east-1.amazonaws.com/fbadslibc84e822f/fbadslibadscraperfunctionbe0a81dbrepo", "ActiveProxyCheckerFunction=171504226527.dkr.ecr.us-east-1.amazonaws.com/fbadslibc84e822f/activeproxycheckerfunctionb56b1dcfrepo", "FbAdsLibDataCleanerFunction=171504226527.dkr.ecr.us-east-1.amazonaws.com/fbadslibc84e822f/fbadslibdatacleanerfunction984b2c8frepo", "FbAdsLibDataStoreFunction=171504226527.dkr.ecr.us-east-1.amazonaws.com/fbadslibc84e822f/fbadslibdatastorefunction09c7961brepo"]
+image_repositories = ["FbAdsLibPageScraperFunction=257097519918.dkr.ecr.us-east-1.amazonaws.com/fbadslibproda6ca8c9d/fbadslibpagescraperfunction5381f075repo", "ActiveProxyCheckerFunction=257097519918.dkr.ecr.us-east-1.amazonaws.com/fbadslibproda6ca8c9d/activeproxycheckerfunctionb56b1dcfrepo", "FbAdsLibAdScraperFunction=257097519918.dkr.ecr.us-east-1.amazonaws.com/fbadslibproda6ca8c9d/fbadslibadscraperfunctionbe0a81dbrepo", "FbAdsLibDataCleanerFunction=257097519918.dkr.ecr.us-east-1.amazonaws.com/fbadslibproda6ca8c9d/fbadslibdatacleanerfunction984b2c8frepo", "FbAdsLibDataStoreFunction=257097519918.dkr.ecr.us-east-1.amazonaws.com/fbadslibproda6ca8c9d/fbadslibdatastorefunction09c7961brepo"]

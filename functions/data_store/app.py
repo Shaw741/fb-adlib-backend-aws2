@@ -10,10 +10,10 @@ class FbAdsLibDataStore:
     def __init__(self):
 
         region = 'us-east-1'
-        host = 'search-testfbadslib-arkod77br4pscry5r4hqaacnfy.us-east-1.es.amazonaws.com'
+        host = 'search-fbadslib-dev-vtocnlf6uhf7y24wy53x6cz2u4.us-east-1.es.amazonaws.com'
         service = 'es'
-        self.bucket_name = "fbadlibtest"
-        self.index_name = 'fbadslib'
+        self.bucket_name = "fbadslib-dev"
+        self.index_name = 'fbadslib-dev'
         
         credentials = boto3.Session().get_credentials()
 

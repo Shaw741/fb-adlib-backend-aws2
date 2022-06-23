@@ -49,11 +49,11 @@ class ActiveProxyChecker:
                 print(e)
             finally:
                 currentDriver.quit()
-                pass
+                break
+                # pass
         return activeProxyList
 
 def lambda_handler(event, context):
-    start_time = datetime.now()
 
     # activeProxyChecker = ActiveProxyChecker()
     # activeProxyList = activeProxyChecker.process_proxies(event["proxyUrls"])
@@ -64,10 +64,6 @@ def lambda_handler(event, context):
         pageProxies["activeProxies"] = event["proxyUrls"]
         pageProxies["pageURL"] = page
         combinedProxyPageList.append(pageProxies)
-
-    end_time = datetime.now()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed run time: {elapsed_time} seconds")
 
     return {
         "statusCode": 200,
