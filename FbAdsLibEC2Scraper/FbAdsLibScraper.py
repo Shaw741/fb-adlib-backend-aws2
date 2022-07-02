@@ -45,7 +45,7 @@ class FbAdsLibScraper:
             print(f"Got All the Ads for : {combinedProxyPage['pageURL']}")
 
             result = []
-            with ThreadPoolExecutor(max_workers=20) as exe:
+            with ThreadPoolExecutor(max_workers=30) as exe:
                 result = exe.map(self.startAdScraper,combinedProxyAdList)
 
         except Exception as ex:

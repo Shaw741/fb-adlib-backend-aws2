@@ -62,7 +62,7 @@ class FbAdLibPageSpider:
                     options  = self.get_chrome_driver_options()
                     driver = webdriver.Chrome("/opt/chromedriver",options=options)
                     driver.get(pageUrl)
-                    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
+                    element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
                     print(f"Working { self.proxyToBeUsed }!!!!")
                     workingDriver = driver
                     break
@@ -78,6 +78,7 @@ class FbAdLibPageSpider:
     def process_page(self, pageUrl):
         print("Page URL to be scraped :- " + pageUrl)
         fbAdLibItemList = []
+        driver = None
         try:
             driver = self.polling_for_driver(pageUrl)
 
@@ -88,7 +89,7 @@ class FbAdLibPageSpider:
                     "startDate":'',
                     "platforms":[],
                     "adID":'',
-                    "noOfCopyAds":0
+                    "noOfCopyAds":"0 ads"
                 }
 
                 for idx, details in enumerate(ads.find_element(by=By.CLASS_NAME, value='hv94jbsx').find_elements(by=By.CLASS_NAME, value='m8urbbhe')):
@@ -154,6 +155,10 @@ class FbAdLibPageSpider:
         except Exception as e:
             print(f"Exception Occured While getting list of ads from page :::: {pageUrl}")
             print(e)
+            if driver:
+                driver.quit()
         finally:
             print(f"Got List Of Ads for a Page  ::::  {pageUrl}")
+            if driver:
+                driver.quit()
             return fbAdLibItemList

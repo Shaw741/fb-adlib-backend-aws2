@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 from FbAdsLibScraper import FbAdsLibScraper
+from decouple import config
 
 try:
     t1 = time.perf_counter()
@@ -19,11 +20,11 @@ try:
     ]
     fbadslibpages=[
             "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=109703320647903&search_type=page&media_type=all",
-            # "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=101194931664714&search_type=page&media_type=all",
-		    # "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=100613581460475&search_type=page&media_type=all",
-		    # "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=2324132321162033&search_type=page&media_type=all",
-		    # "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=101672787924056&search_type=page&media_type=all",
-		    # "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=100166531477296&search_type=page&media_type=all"
+            "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=101194931664714&search_type=page&media_type=all",
+		    "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=100613581460475&search_type=page&media_type=all",
+		    "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=2324132321162033&search_type=page&media_type=all",
+		    "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=101672787924056&search_type=page&media_type=all",
+		    "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=100166531477296&search_type=page&media_type=all"
           ]
     fbAdsLibScraper = FbAdsLibScraper(proxyUrls, fbadslibpages)
     fbAdsLibScraper.startScraper()

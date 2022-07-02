@@ -14,7 +14,7 @@ class FbAdsLibDataStore:
         host = 'search-fbadslib-dev-vtocnlf6uhf7y24wy53x6cz2u4.us-east-1.es.amazonaws.com'
         service = 'es'
         self.bucket_name = "fbadslib-dev"
-        self.index_name = 'fbadslib-dev-test'
+        self.index_name = 'fbadslib-dev'
 
         self.s3 = boto3.client("s3",
                           aws_access_key_id=config("aws_access_key_id"),
@@ -160,5 +160,7 @@ class FbAdsLibDataStore:
                         self.create_new_ad(newFbAdlibItem)
         else:
             self.create_new_ad(newFbAdlibItem)
+
+        print(f"SuccessFull Data Stored for Ad :- {newFbAdlibItem['adID']}")
 
         return newFbAdlibItem
