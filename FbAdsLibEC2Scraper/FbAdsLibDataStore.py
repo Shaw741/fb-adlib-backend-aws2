@@ -53,7 +53,7 @@ class FbAdsLibDataStore:
             'media_data':str(media_data.data),
             'headline':fbAdlibItem["headline"],
             'page_name':fbAdlibItem["pageInfo"]["name"],
-            'ad_id':fbAdlibItem["adID"],
+            'ad_description':fbAdlibItem["adDescription"],
             'purchase_url':fbAdlibItem["purchaseURL"],
             'displayURL':fbAdlibItem['displayURL'],
             'purchase_description':fbAdlibItem["purchaseDescription"],
@@ -103,7 +103,7 @@ class FbAdsLibDataStore:
                         "must": [
                         {
                             "match": {
-                            "adID": oldFbAdlibItem["adID"]
+                            "hash": oldFbAdlibItem["hash"]
                             }
                         }
                         ]
@@ -156,7 +156,7 @@ class FbAdsLibDataStore:
                     if storedAd["status"] == 'Active':
                         """Make Active ad as Inactive"""
                         """Create new ad"""
-                        self.update_ad(storedAd, "ctx._source.status=='Inactive'")
+                        self.update_ad(storedAd, "ctx._source.status='Inactive'")
                         self.create_new_ad(newFbAdlibItem)
         else:
             self.create_new_ad(newFbAdlibItem)

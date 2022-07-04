@@ -82,6 +82,7 @@ class FbAdLibAdSpider:
 
     def process_ad(self, fbAdlibItem):
         fbAdlibItem["adMediaURL"] = ""
+        fbAdlibItem["adMediaThumbhnail"] = ""
         fbAdlibItem["adMediaType"] = ""
         fbAdlibItem["adDescription"] = ""
         fbAdlibItem["ctaStatus"] = ""
@@ -115,6 +116,7 @@ class FbAdLibAdSpider:
             if fbAdlibItem["adMediaURL"] == "":
                 try:
                     fbAdlibItem["adMediaURL"] = driver.find_element(by=By.CLASS_NAME, value='effa2scm > .qi2u98y8').find_element(by=By.TAG_NAME, value='video').get_attribute('src')
+                    fbAdlibItem["adMediaThumbhnail"] = driver.find_element(by=By.CLASS_NAME, value='effa2scm > .qi2u98y8').find_element(by=By.TAG_NAME, value='video').get_attribute('poster')
                     fbAdlibItem["adMediaType"] = "video"
                 except Exception as e:
                     print("Exception while adMediaURL Video")

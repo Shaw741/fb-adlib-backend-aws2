@@ -8,7 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from decouple import config
 from selenium.webdriver.chrome.options import Options
 
-class FbAdLibPageSpider:
+class FbAdLibDomainSpider:
 
     def __init__(self, proxylist):
         self.proxylist = proxylist
@@ -48,7 +48,7 @@ class FbAdLibPageSpider:
 
         return options
 
-    def polling_for_driver(self, pageUrl):
+    def polling_for_driver(self, domain):
         attempts = 0
         workingDriver = None
         while True:
@@ -61,7 +61,7 @@ class FbAdLibPageSpider:
                 try:
                     options  = self.get_chrome_driver_options()
                     driver = webdriver.Chrome("/opt/chromedriver",options=options)
-                    driver.get(pageUrl)
+                    driver.get(domain)
                     element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
                     print(f"Working { self.proxyToBeUsed }!!!!")
                     workingDriver = driver
@@ -75,16 +75,17 @@ class FbAdLibPageSpider:
         return workingDriver            
             
 
-    def process_page(self, pageUrl):
-        print("Page URL to be scraped :- " + pageUrl)
+    def process_domain(self, domain):
+        print("Domain to be scraped :- " + domain)
         fbAdLibItemList = []
         driver = None
         try:
-            driver = self.polling_for_driver(pageUrl)
+            driver = self.polling_for_driver(f"https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q={domain}")
 
             for ads in driver.find_elements(by=By.CLASS_NAME, value="_99s5"):
 
                 fbAdlibItem = {
+                    "domain": domain,
                     "status": '',
                     "startDate":'',
                     "platforms":[],
@@ -153,12 +154,12 @@ class FbAdLibPageSpider:
 
                 fbAdLibItemList.append(fbAdlibItem)
         except Exception as e:
-            print(f"Exception Occured While getting list of ads from page :::: {pageUrl}")
+            print(f"Exception Occured While getting list of ads from domain :::: {domain}")
             print(e)
             if driver:
                 driver.quit()
         finally:
-            print(f"Got List Of Ads for a Page  ::::  {pageUrl}")
+            print(f"Got List Of Ads for a Domain  ::::  {domain}")
             if driver:
                 driver.quit()
             return fbAdLibItemList

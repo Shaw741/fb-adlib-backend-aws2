@@ -1,13 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
 from FbAdLibAdDataCleaner import FbAdLibAdDataCleaner
 from FbAdLibAdSpider import FbAdLibAdSpider
-from FbAdLibPageSpider import FbAdLibPageSpider
+from FbAdLibDomainSpider import FbAdLibDomainSpider
 from FbAdsLibDataStore import FbAdsLibDataStore
 
 class FbAdsLibScraper:
 
-    def __init__(self, proxyUrls, fbadslibpages):
-        self.scraperInput = { "proxyUrls" : proxyUrls, "fbadslibpages" : fbadslibpages }
+    def __init__(self, proxyUrls, fbadslibdomains):
+        self.scraperInput = { "proxyUrls" : proxyUrls, "fbadslibdomains" : fbadslibdomains }
 
     def startDataCleaner(self,fbAdlibItem):
         fbAdLibAdDataCleaner = FbAdLibAdDataCleaner()
@@ -29,41 +29,41 @@ class FbAdsLibScraper:
 
         print(f"Data is successfully stored for Ad : {storedFbAdlibItem['adID']}")
 
-    def startPageScraper(self, combinedProxyPage):
+    def startDomainScraper(self, combinedProxyDomain):
 
-        fbAdLibPageSpider = FbAdLibPageSpider(combinedProxyPage["activeProxies"])
+        fbAdLibDomainSpider = FbAdLibDomainSpider(combinedProxyDomain["activeProxies"])
         try:
-            fbAdLibItemList = fbAdLibPageSpider.process_page(combinedProxyPage["pageURL"])
+            fbAdLibItemList = fbAdLibDomainSpider.process_domain(combinedProxyDomain["domain"])
 
             combinedProxyAdList = []
             for fbAdLibItem in fbAdLibItemList:
                 adProxies = {}
-                adProxies["activeProxies"] = combinedProxyPage["activeProxies"]
+                adProxies["activeProxies"] = combinedProxyDomain["activeProxies"]
                 adProxies["fbAdlibItem"] = fbAdLibItem
                 combinedProxyAdList.append(adProxies)
 
-            print(f"Got All the Ads for : {combinedProxyPage['pageURL']}")
+            print(f"Got All the Ads for : {combinedProxyDomain['domain']}")
 
             result = []
             with ThreadPoolExecutor(max_workers=30) as exe:
                 result = exe.map(self.startAdScraper,combinedProxyAdList)
 
         except Exception as ex:
-            print(f'fn.startPageScraper Exception Occured !!!')
+            print(f'fn.startDomainScraper Exception Occured !!!')
             print(ex)
         
     def startScraper(self):
 
         try:
-            combinedProxyPageList = []
-            for page in self.scraperInput["fbadslibpages"]:
-                pageProxies = {}
-                pageProxies["activeProxies"] = self.scraperInput["proxyUrls"]
-                pageProxies["pageURL"]       = page
-                combinedProxyPageList.append(pageProxies)
+            combinedProxyDomainList = []
+            for domain in self.scraperInput["fbadslibdomains"]:
+                domainProxies = {}
+                domainProxies["activeProxies"] = self.scraperInput["proxyUrls"]
+                domainProxies["domain"]       = domain
+                combinedProxyDomainList.append(domainProxies)
 
             with ThreadPoolExecutor(max_workers=10) as exe:
-                result = exe.map(self.startPageScraper,combinedProxyPageList)
+                result = exe.map(self.startDomainScraper,combinedProxyDomainList)
 
         except Exception as ex:
             print("Fn.startScraper Exception Occured !!!")
