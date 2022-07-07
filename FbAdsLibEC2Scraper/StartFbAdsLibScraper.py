@@ -20,7 +20,9 @@ try:
     ]
     fbadslibdomains=[
             "newgadgetst.com",
-            "reshline.com",
+            # "reshline.com",
+            "amgomall.com",
+            "lovesew.com"
           ]
     fbAdsLibScraper = FbAdsLibScraper(proxyUrls, fbadslibdomains)
     fbAdsLibScraper.startScraper()

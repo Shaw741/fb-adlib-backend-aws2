@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs
 
 class FbAdLibAdDataCleaner:
 
@@ -21,7 +22,7 @@ class FbAdLibAdDataCleaner:
             adDataToBeCleaned["startDate"] = date_time_obj.strftime("%Y-%m-%d")
 
             #noOfCopyAds
-            adDataToBeCleaned["noOfCopyAds"]=adDataToBeCleaned["noOfCopyAds"].replace("ads","").strip()
+            adDataToBeCleaned["noOfCopyAds"]=int(adDataToBeCleaned["noOfCopyAds"].replace("ads","").strip())
 
             #adDescription
             adDataToBeCleaned["adDescription"]=adDataToBeCleaned["adDescription"].replace("\n","").strip()
@@ -36,6 +37,8 @@ class FbAdLibAdDataCleaner:
             adDataToBeCleaned["displayURL"]=adDataToBeCleaned["displayURL"].strip()
             adDataToBeCleaned["headline"]=adDataToBeCleaned["headline"].strip()
             adDataToBeCleaned["purchaseURL"]=adDataToBeCleaned["purchaseURL"].strip()
+            parsed_url = urlparse(adDataToBeCleaned["purchaseURL"])
+            adDataToBeCleaned["purchaseURL"] = parse_qs(parsed_url.query)["u"][0]
             adDataToBeCleaned["pageInfo"]["name"]=adDataToBeCleaned["pageInfo"]["name"].strip()
             adDataToBeCleaned["pageInfo"]["url"]=adDataToBeCleaned["pageInfo"]["url"].strip()
             adDataToBeCleaned["pageInfo"]["logo"]=adDataToBeCleaned["pageInfo"]["logo"].strip()
@@ -44,5 +47,7 @@ class FbAdLibAdDataCleaner:
         except Exception as ex:
             print(f"Exception Occured at Data Cleaning For Ad :---{adDataToBeCleaned['adID']}")
             print(ex)
+
+        print("After clean ad data :", adDataToBeCleaned["noOfCopyAds"])
 
         return adDataToBeCleaned

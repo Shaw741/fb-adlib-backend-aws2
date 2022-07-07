@@ -82,7 +82,7 @@ class FbAdLibAdSpider:
 
     def process_ad(self, fbAdlibItem):
         fbAdlibItem["adMediaURL"] = ""
-        fbAdlibItem["adMediaThumbhnail"] = ""
+        fbAdlibItem["adMediaThumbnail"] = ""
         fbAdlibItem["adMediaType"] = ""
         fbAdlibItem["adDescription"] = ""
         fbAdlibItem["ctaStatus"] = ""
@@ -116,7 +116,7 @@ class FbAdLibAdSpider:
             if fbAdlibItem["adMediaURL"] == "":
                 try:
                     fbAdlibItem["adMediaURL"] = driver.find_element(by=By.CLASS_NAME, value='effa2scm > .qi2u98y8').find_element(by=By.TAG_NAME, value='video').get_attribute('src')
-                    fbAdlibItem["adMediaThumbhnail"] = driver.find_element(by=By.CLASS_NAME, value='effa2scm > .qi2u98y8').find_element(by=By.TAG_NAME, value='video').get_attribute('poster')
+                    fbAdlibItem["adMediaThumbnail"] = driver.find_element(by=By.CLASS_NAME, value='effa2scm > .qi2u98y8').find_element(by=By.TAG_NAME, value='video').get_attribute('poster')
                     fbAdlibItem["adMediaType"] = "video"
                 except Exception as e:
                     print("Exception while adMediaURL Video")
@@ -184,8 +184,7 @@ class FbAdLibAdSpider:
                     "other":"",
                     "type":""
                 }
-                try:
-                    platforms.find_element(by=By.CLASS_NAME, value='sx_8d6c45')
+                if platforms.text.__contains__('likes'):
                     platform["name"] = "Facebook"
                     for info in platforms.find_elements(by=By.CLASS_NAME, value="i0ppjblf"):
                         if info.text.__contains__('likes'):
@@ -194,17 +193,17 @@ class FbAdLibAdSpider:
                                 platform["type"] = info.text.split('•')[1].strip()
                         else:
                             platform["other"] = info.text
-                except:
-                    platforms.find_element(by=By.CLASS_NAME, value='sx_b53abc')
+
+                elif platforms.text.__contains__('followers'):
                     platform["name"] = "Instagram"
                     for info in platforms.find_elements(by=By.CLASS_NAME, value="i0ppjblf"):
                         if info.text.__contains__('followers'):
                             platform["followers"] = int(info.text.split(' ')[0].replace(',', ''))
                         else:
                             platform["other"] = info.text
-                finally:
-                    pageInfo["platforms"].append(platform)
 
+                pageInfo["platforms"].append(platform)
+                    
             fbAdlibItem["pageInfo"] = pageInfo
             # try:
             #     line = json.dumps(fbAdlibItem.__dict__) + ","

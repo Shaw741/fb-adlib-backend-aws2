@@ -90,7 +90,7 @@ class FbAdLibDomainSpider:
                     "startDate":'',
                     "platforms":[],
                     "adID":'',
-                    "noOfCopyAds":"0 ads"
+                    "noOfCopyAds":"1 ads"
                 }
 
                 for idx, details in enumerate(ads.find_element(by=By.CLASS_NAME, value='hv94jbsx').find_elements(by=By.CLASS_NAME, value='m8urbbhe')):
@@ -147,7 +147,7 @@ class FbAdLibDomainSpider:
                 try:
                     text = ads.find_element(by=By.CLASS_NAME, value='hv94jbsx').find_element(by=By.CLASS_NAME, value='_9b9y')
                     if text:
-                        fbAdlibItem["noOfCopyAds"] = int(text.find_element(by=By.TAG_NAME, value='strong').text)
+                        fbAdlibItem["noOfCopyAds"] = text.find_element(by=By.TAG_NAME, value='strong').text
                 except Exception as e:
                     print("Exception at noOfCopyAds :--")
                     #print(e)
