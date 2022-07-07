@@ -224,16 +224,33 @@ class FbAdsLibDataStore:
                         """Media URL is also matched go for Status Check!!"""
                         print("Media URL is also matched go for Status Check!!")
                         print(f"Status is :- {storedAd['status']}")
-                        if storedAd["status"] == 'Active':
-                            """Just Update No. Of ads and finish !!"""
-                            print('Just Update No. Of ads and finish !!')
-                            self.update_ad(storedAd, 
-                                        f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
-                        elif storedAd["status"] == 'Inactive':
-                            """Make it Active and update ad count!!"""
-                            print('Make it Active and update ad count!!')
-                            self.update_ad(storedAd, 
-                                        f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.status='Active';ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
+
+                        if newFbAdlibItem['status'] == "Active":
+                            if storedAd["status"] == 'Active':
+                                """Just Update No. Of ads and finish !!"""
+                                print('new --> active & old --> active |||| Just Update No. Of ads and finish !!')
+
+                                self.update_ad(storedAd, 
+                                            f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
+                            elif storedAd["status"] == 'Inactive':
+                                """Make it Active and update ad count!!"""
+                                print('new --> active & old --> Inactive |||| Make old Active and update ad count!!')
+                                self.update_ad(storedAd, 
+                                            f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.status='Active';ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
+
+                        elif newFbAdlibItem['status'] == "Inactive":
+                            if storedAd["status"] == 'Active':
+                                """Just Update No. Of ads and finish !!"""
+                                print('new --> Inactive & old --> active |||| Make old Inactive and update ad count!!')
+
+                                self.update_ad(storedAd, 
+                                            f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.status='Inactive';ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
+                            elif storedAd["status"] == 'Inactive':
+                                """Make it Active and update ad count!!"""
+                                print('new --> Inactive & old --> Inactive |||| Just Update No. Of ads and finish !!')
+                                self.update_ad(storedAd, 
+                                            f"ctx._source.history['{today}']={newFbAdlibItem['noOfCopyAds']};ctx._source.noOfCopyAds={newFbAdlibItem['noOfCopyAds']}")
+
                     else:
                         """Media URL is not matched now go for Status Check!!"""
                         print("Data Points are same but media url is different")

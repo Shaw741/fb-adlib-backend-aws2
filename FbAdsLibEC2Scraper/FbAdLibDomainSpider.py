@@ -7,6 +7,7 @@ import boto3
 from webdriver_manager.chrome import ChromeDriverManager
 from decouple import config
 from selenium.webdriver.chrome.options import Options
+import sys
 
 class FbAdLibDomainSpider:
 
@@ -62,10 +63,22 @@ class FbAdLibDomainSpider:
                     options  = self.get_chrome_driver_options()
                     driver = webdriver.Chrome("/opt/chromedriver",options=options)
                     driver.get(domain)
-                    element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
-                    print(f"Working { self.proxyToBeUsed }!!!!")
-                    workingDriver = driver
-                    break
+                    try:
+                        element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.XPATH, "//*[text()='0 results']")))
+                        print(f"Got 0 ads for domain: {domain}")
+                        break
+                    except:
+                        try:
+                            element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, "_99s5")))
+                            print(f"Working { self.proxyToBeUsed }!!!!")
+                            workingDriver = driver
+                            break
+                        except Exception as ex:
+                            if driver:
+                                driver.quit()
+                            print(f"Not Working { self.proxyToBeUsed }!!!!")
+                            print(ex)
+                            continue
                 except Exception as ex:
                     if driver:
                         driver.quit()
@@ -81,7 +94,6 @@ class FbAdLibDomainSpider:
         driver = None
         try:
             driver = self.polling_for_driver(f"https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q={domain}")
-
             for ads in driver.find_elements(by=By.CLASS_NAME, value="_99s5"):
 
                 fbAdlibItem = {
@@ -127,7 +139,7 @@ class FbAdLibDomainSpider:
                         except Exception as e:
                             fbAdlibItem["platforms"] = platformList
                             #print(e)
-                    if idx == 3:
+                    if idx > 2:
                         text = details.find_element(by=By.TAG_NAME, value='span').text
                         if text.__contains__('ID'):
                             try:
@@ -135,14 +147,6 @@ class FbAdLibDomainSpider:
                             except Exception as e:
                                 print("Exception at while adID :")
                                 #print(e)
-                    if idx == 4:
-                        text = details.find_element(by=By.TAG_NAME, value='span').text
-                        try:
-                            if text.__contains__('ID'):
-                                fbAdlibItem["adID"] = text.split(':')[1].strip()
-                        except Exception as e:
-                            print("Exception at while adID :")
-                            #print(e)
 
                 try:
                     text = ads.find_element(by=By.CLASS_NAME, value='hv94jbsx').find_element(by=By.CLASS_NAME, value='_9b9y')
@@ -152,7 +156,12 @@ class FbAdLibDomainSpider:
                     print("Exception at noOfCopyAds :--")
                     #print(e)
 
-                fbAdLibItemList.append(fbAdlibItem)
+                try:
+                    ads.find_element(by=By.XPATH, value="// *[contains(text(),'we cannot show you this ad')]")
+                    print("we cannot show you this ad")
+                except:
+                    fbAdLibItemList.append(fbAdlibItem)
+
         except Exception as e:
             print(f"Exception Occured While getting list of ads from domain :::: {domain}")
             print(e)
