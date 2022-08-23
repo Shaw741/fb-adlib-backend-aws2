@@ -255,7 +255,7 @@ def getAllSavedAds(request):
             if fb_likes:
                 likes_query={
                     "range": {
-                    "pageInfo.platforms.likes": {
+                    "pageInfo.platforms.Facebook.likes": {
                         "gte": int(fb_likes[0]),
                         "lte": int(fb_likes[1])
                         }
@@ -266,7 +266,7 @@ def getAllSavedAds(request):
             if insta_followers:
                 followers_query={
                     "range": {
-                        "pageInfo.platforms.followers": {
+                        "pageInfo.platforms.Instagram.followers": {
                         "gte": int(insta_followers[0]),
                         "lte": int(insta_followers[1])
                         }
@@ -426,7 +426,7 @@ class getAllAds(viewsets.ViewSet):
         if fb_likes:
             likes_query={
                 "range": {
-                "pageInfo.platforms.likes": {
+                "pageInfo.platforms.Facebook.likes": {
                     "gte": int(fb_likes[0]),
                     "lte": int(fb_likes[1])
                     }
@@ -437,7 +437,7 @@ class getAllAds(viewsets.ViewSet):
         if insta_followers:
             followers_query={
                 "range": {
-                    "pageInfo.platforms.followers": {
+                    "pageInfo.platforms.Instagram.followers": {
                     "gte": int(insta_followers[0]),
                     "lte": int(insta_followers[1])
                     }
@@ -612,7 +612,7 @@ def checkAdByFilter(request):
     if fb_likes:
         likes_query={
             "range": {
-            "pageInfo.platforms.likes": {
+            "pageInfo.platforms.Facebook.likes": {
                 "gte": int(fb_likes[0]),
                 "lte": int(fb_likes[1])
                 }
@@ -623,7 +623,7 @@ def checkAdByFilter(request):
     if insta_followers:
         followers_query={
             "range": {
-                "pageInfo.platforms.followers": {
+                "pageInfo.platforms.Instagram.followers": {
                 "gte": int(insta_followers[0]),
                 "lte": int(insta_followers[1])
                 }
