@@ -5,6 +5,7 @@ from functools import partial
 from typing_extensions import final
 from django.shortcuts import render
 from elastic_transport import Serializer
+from numpy import size
 from rest_framework import viewsets
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
@@ -1114,6 +1115,7 @@ def Databyid(request):
     id=request.data.get("id")
     if id:
         query={
+                "size":10000,
                 "query": {
                     "match": {
                         "_id" : id
