@@ -276,9 +276,10 @@ def getAllSavedAds(request):
                 query["query"]["bool"]["must"].append(media_query)
 
             if ctaStatus:
+                ctaStatus_list=cta_status_fetch(ctaStatus)
                 cta_query={
-                    "match": {
-                        "ctaStatus": ctaStatus
+                    "terms": {
+                        "ctaStatus.keyword": ctaStatus_list
                     }
                 }
                 query["query"]["bool"]["must"].append(cta_query)
@@ -447,9 +448,10 @@ class getAllAds(viewsets.ViewSet):
             query["query"]["bool"]["must"].append(media_query)
 
         if ctaStatus:
+            ctaStatus_list=cta_status_fetch(ctaStatus)
             cta_query={
-                "match": {
-                    "ctaStatus": ctaStatus
+                "terms": {
+                    "ctaStatus.keyword": ctaStatus_list
                 }
             }
             query["query"]["bool"]["must"].append(cta_query)
@@ -1147,3 +1149,17 @@ def resendVerificationEmail(request):
     
     r=rh.ResponseMsg(data={},error=True,msg="User with this email address does not exist with us.")
     return Response(r.response)
+
+def cta_status_fetch(cta_status):
+    query={
+        "query": {
+            "match": {
+                "ctaStatus" : cta_status
+            }
+        }
+    }
+    res=es.search(index=es_indice,body=query)
+    if res["hits"]["hits"]:
+        list_using_comp = [(d["_source"]["ctaStatus"]) for d in res["hits"]["hits"] if (d["_source"]["ctaStatus"]).lower() == cta_status.lower() ]
+        return list_using_comp
+        
