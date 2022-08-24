@@ -1089,6 +1089,7 @@ def create_checkout_session(request):
 @permission_classes([IsAuthenticated])
 def getCtaStatus(request):
     query={
+        "size":10000,
         "query": {
             "match_all": {}
         }
