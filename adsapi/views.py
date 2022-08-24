@@ -286,7 +286,7 @@ def getAllSavedAds(request):
             if ctaStatus:
                 cta_query={
                     "match": {
-                        "ctaStatus": ctaStatus
+                        "ctaStatus.keyword": ctaStatus
                     }
                 }
                 query["query"]["bool"]["must"].append(cta_query)
@@ -457,7 +457,7 @@ class getAllAds(viewsets.ViewSet):
         if ctaStatus:
             cta_query={
                 "match": {
-                    "ctaStatus": ctaStatus
+                    "ctaStatus.keyword": ctaStatus
                 }
             }
             query["query"]["bool"]["must"].append(cta_query)
@@ -643,7 +643,7 @@ def checkAdByFilter(request):
     if ctaStatus:
         cta_query={
             "match": {
-                "ctaStatus": ctaStatus
+                "ctaStatus.keyword": ctaStatus
             }
         }
         query["query"]["bool"]["must"].append(cta_query)
